@@ -98,29 +98,6 @@ export async function getGraphQLData(token) {
     const variables = { userId: userId, eventId: mainEventId };
     const data = await runQuery(masterQuery, variables, token);
     
-    // Debug: Log total XP and group by eventId
-    if (data && data.transaction) {
-        const totalXP = data.transaction.reduce((sum, tx) => sum + tx.amount, 0);
-        
-        // Group by eventId to see breakdown
-        const byEvent = {};
-        data.transaction.forEach(tx => {
-            const eid = tx.eventId || 'unknown';
-            if (!byEvent[eid]) byEvent[eid] = { count: 0, xp: 0 };
-            byEvent[eid].count++;
-            byEvent[eid].xp += tx.amount;
-        });
-        
-        console.log(`Loaded ${data.transaction.length} XP transactions`);
-        console.log(`Total XP: ${(totalXP / 1000).toFixed(2)} kB`);
-        console.log(`XP by Event ID:`, Object.entries(byEvent).map(([id, data]) => 
-            `Event ${id}: ${(data.xp/1000).toFixed(2)} kB (${data.count} transactions)`
-        ));
-        if (data.transaction.length > 0) {
-            console.log(`Date range: ${new Date(data.transaction[0].createdAt).toLocaleDateString()} → ${new Date(data.transaction[data.transaction.length-1].createdAt).toLocaleDateString()}`);
-        }
-    }
-    
     return data;
 }
 

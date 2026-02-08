@@ -15,7 +15,7 @@ export function renderProfile(data, userData){
             <div class="card">
                 <h3>Identity</h3>
                 <p>ID: #${userData.id}</p>
-                <p style="font-size: 0.7em; color: rgba(255,255,255,0.6);">${userData.login}</p>
+                <p style="font-size: 1em; color: rgba(255,255,255,0.6);">${userData.login}</p>
             </div>
             <div class="card">
                 <h3>Audit Ratio</h3>

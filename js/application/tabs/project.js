@@ -11,8 +11,8 @@ export function renderProjects(data) {
         : 0;
 
     const xpTransactions = allTransactions.filter(tx => tx.type === 'xp');
-    const totalXPBytes = xpTransactions.reduce((sum, tx) => sum + tx.amount, 0);
-    const totalXPDisplay = (totalXPBytes / 1000).toFixed(1);
+    const totalXPBytes = allTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+    const totalXPDisplay = (totalXPBytes / 1000).toFixed(2);
 
     const statsHeaderHTML = `
     <div class="stats-grid">
@@ -49,7 +49,7 @@ export function renderProjects(data) {
                         <span style="font-size: 0.8em; color: rgba(255,255,255,0.5);">${date}</span>
                     </div>
                     <span style="font-weight: bold; color: ${tx.amount > 0 ? "#4af847": "#f52929"}; font-family: monospace; font-size: 1.1em;">
-                        ${tx.amount > 0 ? "+": ""} ${xpAmount} kB
+                        ${tx.amount > 0 ? "+": ""}${xpAmount} kB
                     </span>
                 </li>
             `;

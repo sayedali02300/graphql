@@ -117,6 +117,7 @@ loginForm.addEventListener("submit", async (e) => {
 
 // 3. UI BUILDER
 function updateUI(data) {
+console.log("ALL DATA:", JSON.stringify(data, null, 2));
     const userData = data.user[0];
     
     const welcomeMsg = document.getElementById('welcome-msg');
