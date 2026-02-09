@@ -1,4 +1,4 @@
-import { createAuditGraph, createXPGraph } from '../graphs.js';
+import { createAuditGraph, createXPGraph } from "../helpers/graphs.js";
 
 export function renderProjects(data) {
     if (!data || !data.transaction) return;
