@@ -9,50 +9,108 @@ export function renderSkills(data) {
         if (!skillsMap[name]) {
             skillsMap[name] = { maxAmount: 0, projects: [] };
         }
+
         skillsMap[name].projects.push({ name: projectName, amount: skill.amount });
         if (skill.amount > skillsMap[name].maxAmount) {
             skillsMap[name].maxAmount = skill.amount;
         }
     });
+    
+    const container = document.getElementById("skills-container");
+    if (!container) return;
 
-    const skillsHTML = Object.entries(skillsMap)
-        .sort(([, a], [, b]) => b.maxAmount - a.maxAmount)
-        .map(([name, info]) => `
-            <div class="skill-tag" onclick="showSkillProjects('${name}', ${JSON.stringify(info.projects).replace(/"/g, '&quot;')})">
-                <span class="skill-name">${name}</span>
-                <span class="skill-amount">${info.maxAmount}%</span>
-            </div>
-        `).join('');
+    container.innerHTML = "";
 
-    const container = document.getElementById('skills-container');
-    if (container) {
-        container.innerHTML = `
-            <div class="skills-grid">${skillsHTML}</div>
-            <div id="projects-panel" class="projects-panel">
-                <p class="placeholder-text">Click a skill</p>
-            </div>
-        `;
-    }
+    const skillsGrid = document.createElement("div");
+    skillsGrid.className = "skills-grid"
+
+    const projectsPanel = document.createElement("div");
+    //delete maybe
+    projectsPanel.id = "projects-panel";
+    projectsPanel.className = "projects-panel";
+
+    const placeholder = document.createElement("p");
+    placeholder.className = 'placeholder-text';
+    placeholder.textContent = "Click a skill";
+    projectsPanel.appendChild(placeholder);
+
+    Object.entries(skillsMap)
+    .sort(([, a], [, b]) => b.maxAmount - a.maxAmount)
+    .forEach(([skillName, info]) => {
+
+        //create tags
+        const skillTag = document.createElement("div");
+        skillTag.className = "skill-tag";
+
+        // the name of each skill
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "skill-name";
+        nameSpan.textContent = skillName +" ";
+
+        // percentage
+        const amountSpan = document.createElement("span");
+        amountSpan.className = "skill-amount";
+        amountSpan.textContent = `${info.maxAmount}` + "%";
+
+        skillTag.addEventListener("click", () => {
+            updateProjectsPanel(projectsPanel, skillName, info.projects);
+        });
+
+        skillTag.appendChild(nameSpan);
+        skillTag.appendChild(amountSpan);
+        skillsGrid.appendChild(skillTag);
+    });
+
+    container.appendChild(skillsGrid);
+    container.appendChild(projectsPanel);
 }
 
-window.showSkillProjects = function(skillName, projects) {
-    const panel = document.getElementById('projects-panel');
-    const projectsList = projects
-        .sort((a, b) => b.amount - a.amount)
-        .map(p => {
-            const textColor = p.amount === 0 ? 'color: #fc2525;' : '';
-            return `
-            <div class="project-item">
-                <span>${p.name}</span>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" style="width: ${p.amount}%"></div>
-                </div>
-                <span style="${textColor}">${p.amount}%</span>
-            </div>
-        `}).join('');
+function updateProjectsPanel(panelElement, skillName, projects){
+    // clean
+    panelElement.innerHTML = "";
 
-    panel.innerHTML = `
-        <h3>Projects for <span class="projnameskill">${skillName}</span></h3>
-        <div class="projects-list">${projectsList}</div>
-    `;
-};
+    const header = document.createElement("h3");
+    header.textContent = "Projects for ";
+
+    const spanName = document.createElement("span");
+    spanName.className = "projnameskill";
+    spanName.textContent = skillName;
+    header.appendChild(spanName);
+
+    panelElement.appendChild(header);
+
+    const listContainer = document.createElement('div');
+    listContainer.className = 'projects-list';
+
+    projects
+    .sort((a, b) => b.amount - a.amount)
+    .forEach(p => {
+        const item = document.createElement("div");
+        item.className = "project-item";
+
+        // name of project
+        const pName = document.createElement("span");
+        pName.textContent = p.name;
+
+        const progressContainer = document.createElement('div');
+        progressContainer.className = 'progress-bar-container';
+
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+
+        progressBar.style.width = `${p.amount}%`;
+        progressContainer.appendChild(progressBar);
+
+        const pAmount = document.createElement('span');
+        pAmount.textContent = `${p.amount}%`;
+        if (p.amount === 0) {
+            pAmount.style.color = '#fc2525';
+        }
+        item.appendChild(pName);
+            item.appendChild(progressContainer);
+            item.appendChild(pAmount);
+            
+            listContainer.appendChild(item);
+        });
+        panelElement.appendChild(listContainer)
+}

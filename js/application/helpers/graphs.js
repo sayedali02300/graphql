@@ -57,7 +57,7 @@ export function createXPGraph(transactions) {
     const next = rawSorted[i + 1];
     if (next && current.amount > 0) {
       const sum = current.amount + next.amount;
-      if (Math.abs(sum) < current.amount * 0.05) {
+      if (Math.abs(sum) <= 0) {
         i++;
         continue;
       }
@@ -97,8 +97,6 @@ export function createXPGraph(transactions) {
   }
   if (groupedXP > 0 && groupedTx) {
     cumulativeXP += groupedXP;
-    const pathParts = groupedTx.path.split("/");
-    console.log(pathParts);
     const projectName = "checkpoint XP";
 
     dataPoints.push({

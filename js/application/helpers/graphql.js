@@ -6,7 +6,7 @@ export async function getGraphQLData(token) {
     // Step 1: Get User ID
     const idQuery = `{ user{id} }`;
     const idData = await runQuery(idQuery, {}, token);
-    console.log("IMPORTANT", idData)
+
     if (!idData || !idData.user || idData.user.length === 0) {
         console.error("Auth Error: User ID not found");
         return null;
@@ -27,11 +27,6 @@ export async function getGraphQLData(token) {
         ) {
             event {
                 id
-                path
-                object {
-                    id
-                    name
-                }
             }
         }
     }`;
@@ -41,9 +36,9 @@ export async function getGraphQLData(token) {
     
     if (objData && objData.progress && objData.progress.length > 0) {
         mainEventId = objData.progress[0].event.id;
-        console.log(`Main event: ${objData.progress[0].event.path} (ID: ${mainEventId})`);
+        console.log("MAIN EVENT ID " + mainEventId)
     }
-
+    
     // Step 3: Master Query - Filter by eventId (this is what the institutional dashboard does)
     const masterQuery = `
     query GetData($userId: Int!, $eventId: Int) {
@@ -70,16 +65,17 @@ export async function getGraphQLData(token) {
             createdAt
             path
             eventId
+            objectId
         }
         progress(
             where: {
-                userId: {_eq: $userId}, 
-                object: {type: {_eq: "project"}}
+                userId: {_eq: $userId},
             }, 
             order_by: {updatedAt: desc}
         ) {
             grade
             object {
+                id
                 name
             }
         }
@@ -97,7 +93,7 @@ export async function getGraphQLData(token) {
 
     const variables = { userId: userId, eventId: mainEventId };
     const data = await runQuery(masterQuery, variables, token);
-    
+    console.log("PROGRESS" + JSON.stringify(data.progress, null, 2));
     return data;
 }
 
@@ -111,14 +107,24 @@ async function runQuery(query, variables, token) {
             },
             body: JSON.stringify({query, variables})
         });
+        if(!response.ok){
+            throw new Error(`SERVER_ERROR: ${response.status}`);
+        }
         const json = await response.json();
         if(json.errors) {
-            console.error("GraphQL Server Error:", json.errors);
-            return null;
+            const errMsg = json.errors[0].message;
+            if (errMsg.includes("JWT") || errMsg.includes("header") || errMsg.includes("token")) {
+                throw new Error("AUTH_ERROR");
+            }
+            throw new Error(`GRAPHQL_ERROR: ${errMsg}`);
         }
         return json.data;
-    } catch (e) {
-        console.error("Network Error:", e);
-        return null;
+    }catch (e) {
+        // If it's already one of our custom errors, re-throw it
+        if (e.message === "AUTH_ERROR" || e.message.startsWith("SERVER_ERROR")) {
+            throw e;
+        }
+        // Otherwise, it's a network/offline issue
+        throw new Error("NETWORK_ERROR");
     }
 }
