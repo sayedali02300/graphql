@@ -22,7 +22,7 @@ export async function getGraphQLData(token) {
                 userId: {_eq: $userId},
                 path: {_like: "%/bh-module/%", _nlike: "%piscine%"}
             },
-            order_by: {createdAt: asc},
+            order_by: {createdAt: desc},
             limit: 1
         ) {
             event {
