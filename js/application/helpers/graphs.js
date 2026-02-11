@@ -24,7 +24,7 @@ export function createAuditGraph(user) {
                 <text x="315" y="${135 - h2}" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">${(down / 1000000).toFixed(2)}MB</text>
             </svg>
             <div class="ratioUnderAuditGraph">
-                Ratio: <span style="font-weight: bold; color: ${user.auditRatio >= 1 ? "#4ade80" : "#fb923c"}; font-size: 1.3em;">${user.auditRatio.toFixed(2)}</span>
+                Ratio: <span style="font-weight: bold; color: ${user.auditRatio >= 1 ? "#4ade80" : "#fb923c"}; font-size: 1.3em;">${user.auditRatio.toFixed(1)}</span>
             </div>
         </div>
     `;

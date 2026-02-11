@@ -24,7 +24,7 @@ export function renderProjects(data) {
             <div class="stat-value">${totalXPDisplay}<span class="stat-unit">kB</span></div>
         </div>
         <div class="stat-card projects-card">
-            <div class="stat-label">Projects</div>
+            <div class="stat-label">Transactions</div>
             <div class="stat-value">${xpTransactions.length}</div>
         </div>
     </div>
