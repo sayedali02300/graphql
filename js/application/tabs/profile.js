@@ -7,11 +7,7 @@ export function renderProfile(data, userData){
         
         let xp = 0;
         if (data.transaction) {
-            data.transaction.forEach(tx => {
-                if(tx.type==="xp"){
-                    xp += tx.amount
-                }
-        });
+            data.transaction.forEach(tx => xp += tx.amount);
         }
         const xpDisplay = (xp / 1000).toFixed(0) + " kB";
     

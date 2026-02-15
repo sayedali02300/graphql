@@ -49,21 +49,33 @@ export function createXPGraph(transactions) {
   const rawSorted = [...xpOnly].sort(
     (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
   );
-
   // here we hide the audits that i failed in
-  const sorted = [];
-  for (let i = 0; i < rawSorted.length; i++) {
-    const current = rawSorted[i];
-    const next = rawSorted[i + 1];
-    if (next && current.amount > 0) {
-      const sum = current.amount + next.amount;
-      if (Math.abs(sum) <= 0) {
-        i++;
-        continue;
-      }
-    }
-    sorted.push(current);
+  const projectMap = new Map();
+  for (const tx of rawSorted) {
+    const key = tx.path;
+    if (!projectMap.has(key)) {
+      projectMap.set(key, {
+        amount: 0,
+        tx: tx 
+      });
   }
+
+  const entry = projectMap.get(key);
+    entry.amount += tx.amount;
+    entry.tx = tx;
+}
+  const sorted = [];
+  projectMap.forEach((value) => {
+    if (value.amount > 0) {
+      // Create a clean transaction object with the correct net amount
+      sorted.push({
+        ...value.tx,
+        amount: value.amount
+      });
+    }
+  });
+
+  sorted.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
   let cumulativeXP = 0;
   let groupedXP = 0;

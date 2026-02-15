@@ -10,7 +10,7 @@ let dashboardData = null;
 export function renderDashboard(data, onLogout) {
     dashboardData = data;
     const app = document.getElementById('app');
-
+    console.log("USER TAB" + JSON.stringify(data.user[0], null, 2))
     // 1. FIXED HTML STRUCTURE (Only the shell, no tab content yet)
     app.innerHTML = `
         <div id="dashboard-layout">
